@@ -5,7 +5,7 @@ const router = new Router();
 
 router.post("/auth/register", async (ctx) => {
   try {
-    const body = await ctx.request.body().value;
+    const body = await ctx.request.body.json();
     const { email, password, name } = body;
     if (!email || !password || !name) {
       ctx.response.status = 400;
@@ -25,7 +25,7 @@ router.post("/auth/register", async (ctx) => {
 
 router.post("/auth/login", async (ctx) => {
   try {
-    const body = await ctx.request.body().value;
+    const body = await ctx.request.body.json();
     const { email, password } = body;
     if (!email || !password) {
       ctx.response.status = 400;
@@ -47,7 +47,7 @@ router.post("/auth/login", async (ctx) => {
 
 router.post("/auth/send-otp", async (ctx) => {
   try {
-    const body = await ctx.request.body().value;
+    const body = await ctx.request.body.json();
     const { email } = body;
     if (!email) {
       ctx.response.status = 400;
@@ -64,7 +64,7 @@ router.post("/auth/send-otp", async (ctx) => {
 
 router.post("/auth/verify-otp", async (ctx) => {
   try {
-    const body = await ctx.request.body().value;
+    const body = await ctx.request.body.json();
     const { email, otp } = body;
     if (!email || !otp) {
       ctx.response.status = 400;

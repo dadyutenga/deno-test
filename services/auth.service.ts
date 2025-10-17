@@ -5,12 +5,7 @@ import { SMTP } from "../config/env.ts";
 import type { User } from "../models/user.model.ts";
 import type { OTP } from "../models/otp.model.ts";
 
-const smtpClient = new SmtpClient({
-  hostname: SMTP.host,
-  port: SMTP.port,
-  username: SMTP.username,
-  password: SMTP.password,
-});
+const smtpClient = new SmtpClient();
 
 export const register = async (
   email: string,
@@ -68,7 +63,12 @@ export const sendOTP = async (email: string): Promise<void> => {
       [email, otpCode, expiresAt],
     );
     // Send email
-    await smtpClient.connect();
+    await smtpClient.connect({
+      hostname: SMTP.host,
+      port: SMTP.port,
+      username: SMTP.username,
+      password: SMTP.password,
+    });
     await smtpClient.send({
       from: SMTP.username,
       to: email,
