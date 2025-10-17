@@ -5,7 +5,7 @@ export const getAll = async (): Promise<User[]> => {
   const client = await pool.connect();
   try {
     const result = await client.queryObject<User>(
-      "SELECT id, name, email, created_at FROM users ORDER BY id",
+      "SELECT id, name, email, is_verified, created_at FROM users ORDER BY id",
     );
     return result.rows;
   } finally {
@@ -17,7 +17,7 @@ export const getById = async (id: number): Promise<User | null> => {
   const client = await pool.connect();
   try {
     const result = await client.queryObject<User>(
-      "SELECT id, name, email, created_at FROM users WHERE id = $1",
+      "SELECT id, name, email, is_verified, created_at FROM users WHERE id = $1",
       [id],
     );
     return result.rows[0] ?? null;
@@ -27,12 +27,12 @@ export const getById = async (id: number): Promise<User | null> => {
 };
 
 export const create = async (payload: Partial<User>): Promise<User> => {
-  const { name, email } = payload;
+  const { name, email, password_hash, is_verified } = payload;
   const client = await pool.connect();
   try {
     const result = await client.queryObject<User>(
-      `INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email, created_at`,
-      [name, email],
+      `INSERT INTO users (name, email, password_hash, is_verified) VALUES ($1, $2, $3, $4) RETURNING id, name, email, is_verified, created_at`,
+      [name, email, password_hash, is_verified],
     );
     return result.rows[0];
   } finally {
@@ -44,12 +44,12 @@ export const update = async (
   id: number,
   payload: Partial<User>,
 ): Promise<User | null> => {
-  const { name, email } = payload;
+  const { name, email, is_verified } = payload;
   const client = await pool.connect();
   try {
     const result = await client.queryObject<User>(
-      `UPDATE users SET name = COALESCE($1, name), email = COALESCE($2, email) WHERE id = $3 RETURNING id, name, email, created_at`,
-      [name, email, id],
+      `UPDATE users SET name = COALESCE($1, name), email = COALESCE($2, email), is_verified = COALESCE($3, is_verified) WHERE id = $4 RETURNING id, name, email, is_verified, created_at`,
+      [name, email, is_verified, id],
     );
     return result.rows[0] ?? null;
   } finally {
